@@ -14,6 +14,7 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 - **getweather.sh** Get current local weather and shorten as much as possible for Twitter
 - **tweet-cam.py** Tweet an image from the Raspberry Pi camera along with the current date, time and IP-based geolocation
 - **tweet-cputemp.py** Tweet your current Raspberry Pi CPU temperature along with the current date, time and IP-based geolocation
+- **tweet-ip.py** Tweet Raspberry Pi IP Address, date, time and IP-based geolocation
 - **tweet-status.py** Tweet the text that is passed as an argument
 - **twitter-api-creds.sh** Sets Twitter API credentials as environment variables
 - **weather.py** Tweet current NYC weather conditions and IP-based geolocation
