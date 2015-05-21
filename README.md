@@ -5,6 +5,7 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 
 [![Build Status](https://travis-ci.org/swoodford/raspberrypi.svg?branch=master)](https://travis-ci.org/swoodford/raspberrypi)
 
+- **customize-pi.sh** Setup and Customize New Raspberry Pi Raspbian Installation
 - **getforecast1.sh** Get current NYC weather forecast and abbreviate as much as possible for Twitter (part 1)
 - **getforecast2.sh** Get current NYC weather forecast and abbreviate as much as possible for Twitter (part 2)
 - **install-air-pi.sh** Install the Shairport Airplay emulator for Raspberry Pi
