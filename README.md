@@ -21,4 +21,4 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 - **tweet-ip.py** Tweet Raspberry Pi IP Address, date, time and IP-based geolocation
 - **tweet-status.py** Tweet the text that is passed as an argument
 - **tweet-weather.py** Tweet current NYC weather conditions and IP-based geolocation
-- **twitter-api-creds.sh** Sets Twitter API credentials as environment variables
+- **twitter-api-creds.py** Sets Twitter API credentials as environment variables
