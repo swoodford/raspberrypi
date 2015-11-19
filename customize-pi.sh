@@ -35,12 +35,14 @@ fi
 
 # UPDATES
 sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get install -y git python-setuptools cmake libssl-dev rpi-update --force-yes
+sudo easy_install pip
+sudo apt-get upgrade -y
 sudo rpi-update
 
 
 # PACKAGE INSTALLATIONS
-sudo apt-get install -y git python-setuptools cmake libssl-dev
+sudo apt-get install -y git python-setuptools cmake libssl-dev rpi-update --force-yes
 sudo easy_install pip
 
 
@@ -58,8 +60,8 @@ sudo bash -c 'echo >> /etc/wpa_supplicant/wpa_supplicant.conf'
 sudo sed -i "s/REPLACE1/$wep_wifi_ssid/" /etc/wpa_supplicant/wpa_supplicant.conf
 sudo sed -i "s/REPLACE2/$wep_wifi_password/" /etc/wpa_supplicant/wpa_supplicant.conf
 
-# sudo ifdown wlan0
-# sudo ifup wlan0
+sudo ifdown wlan0
+sudo ifup wlan0
 
 # SSH
 mkdir ~/.ssh
