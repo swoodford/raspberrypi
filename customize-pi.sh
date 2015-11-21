@@ -33,17 +33,12 @@ if [ "$id_rsa_pub" = "YOUR SSH PUB KEY" ]; then
 fi
 
 
-# UPDATES
+# PACKAGE UPDATES AND INSTALLATIONS
 sudo apt-get update
-sudo apt-get install -y git python-setuptools cmake libssl-dev rpi-update --force-yes
+sudo apt-get install -y git ImageMagick python-setuptools cmake libssl-dev rpi-update --force-yes
 sudo easy_install pip
 sudo apt-get upgrade -y
 sudo rpi-update
-
-
-# PACKAGE INSTALLATIONS
-sudo apt-get install -y git python-setuptools cmake libssl-dev rpi-update --force-yes
-sudo easy_install pip
 
 
 # CONFIG NETWORKING
