@@ -2,6 +2,14 @@
 
 # Script to build Raspbian bootable SD card from Raspbian img file
 
+DEBUGMODE=0
+
+# Functions
+
+# Check required commands
+function check_command {
+	type -P $1 &>/dev/null || fail "Unable to find $1, please install it and run this script again."
+}
 
 # Fail
 function fail(){
@@ -9,50 +17,131 @@ function fail(){
 	exit 1
 }
 
-# clear
+# Success
+function success(){
+	tput setaf 2; echo "$*" && tput sgr0
+}
 
-RASPBIAN=$(find ~/Downloads -type f -name "*raspbian*.img")
+# Pause
+function pause(){
+	read -p "Press any key to continue..."
+	echo
+}
 
-if [ -z "$RASPBIAN" ]; then
-	ZIPPED=$(find ~/Downloads -type f -name "*raspbian*.zip")
-	if [ -z "$ZIPPED" ]; then
-		fail "Could not find any Raspbian images."
+# Select Raspian Image
+function image(){
+	# clear
+	echo	"================================================================================================="
+	success "This tool will build a Raspbian bootable SD card from Raspbian img file in your Downloads folder."
+	echo	"================================================================================================="
+	pause
+
+	RASPBIAN=$(find ~/Downloads -type f -name "*raspbian*.img")
+
+	if [ -z "$RASPBIAN" ]; then
+		ZIPPED=$(find ~/Downloads -type f -name "*raspbian*.zip")
+		if [ -z "$ZIPPED" ]; then
+			fail "Could not find any Raspbian images."
+		else
+			echo "List of compressed Raspbian images"
+			echo "$ZIPPED"
+			fail "Must uncompress image first."
+		fi
 	else
-		echo "List of compressed Raspbian images"
-		echo "$ZIPPED"
-		fail "Must uncompress image first."
-	fi
-else
-	echo "List of Raspbian images found in Downloads:"
-	echo "$RASPBIAN"
-	read -rp "Use this Raspbian image? (y/n) " REPLY
-	if [[ $REPLY =~ ^[Nn]$ ]]; then
+		NUMIMAGES=$(echo "$RASPBIAN" | wc -l)
+		success Found $NUMIMAGES Raspbian images in Downloads.
 		echo
-		read -rp "Enter full path to Raspbian image: " REPLY
-		RASPBIAN=$REPLY
+		# echo "List of Raspbian images found in Downloads:"
+		success "$RASPBIAN"
+		# echo Number of images found: $NUMIMAGES
+
+		if [ "$NUMIMAGES" -gt "1" ]; then
+			START=1
+			for (( COUNT=$START; COUNT<=$NUMIMAGES; COUNT++ ))
+			do
+				# echo "====================================================="
+				# echo \#$COUNT
+				IMAGE=$(echo "$RASPBIAN" | nl | grep -w $COUNT | cut -f2)
+				echo "Image: "$IMAGE
+				read -rp "Use this Raspbian image? (y/n) " REPLY
+				echo
+				if [[ $REPLY =~ ^[Yy]$ ]]; then
+					SELECTED="Y"
+					break
+				fi
+
+				# if [[ $REPLY =~ ^[Nn]$ ]]; then
+				# 	echo
+				# 	read -rp "Enter full path to Raspbian image: " REPLY
+				# 	RASPBIAN=$REPLY
+				# fi
+			done
+
+			if ! [[ $SELECTED =~ "Y" ]]; then
+				fail "Must select at least one Raspbian image!"
+			fi
+		fi
 	fi
-fi
-echo
-echo "List of mounted disks:"
-echo
-df -lH
-# ls -fl /Volumes/
-echo
-echo "Full path to disk for your Raspberry Pi MicroSD Card?"
-echo "Example: /dev/disk5"
-read DISK
-read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-	echo "Unmounting" $DISK
-	diskutil unmountDisk $DISK
-	echo "Formatting with FAT32"
-	sudo diskutil eraseDisk FAT32 RASPBERRYPI MBRFormat $DISK
-	echo "Installing the Raspberry Pi image... (this may take some time)"
-	UNMOUNT=$(diskutil unmountDisk $DISK)
-	if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
-		UNMOUNT=$(diskutil unmountDisk $DISK)
+}
+
+# Select Mounted Disk
+function disk(){
+	echo
+	echo	"================================================================================================="
+	success "List of mounted disks:"
+	echo
+	df -lH
+	success "(The Filesystem column is the path to the disk.)"
+	echo	"================================================================================================="
+	# ls -fl /Volumes/
+	echo
+	echo "Type the full Filesystem path to disk for your Raspberry Pi MicroSD Card:"
+	echo "Example: /dev/disk5"
+	read DISK
+	if [ -z "$DISK" ]; then
+		fail "Must enter full path to disk to format!"
 	fi
-    sudo dd bs=1m if=$RASPBIAN of=$DISK
-fi
-echo "Done!"
+	tput setaf 1; echo "WARNING THE NEXT STEP WILL ERASE THE DISK!!!"
+	# tput setaf 1; 
+	read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY && tput sgr0
+	echo
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		echo "Unmounting" $DISK
+		UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
+		if echo "$UNMOUNT" | grep -q "fail"; then
+			fail "$UNMOUNT"
+			exit 1
+		fi
+		echo "Formatting with FAT32"
+		FORMAT=$(sudo diskutil eraseDisk FAT32 RASPBERRYPI MBRFormat $DISK 2>&1)
+		if echo "$FORMAT" | grep -q "fail"; then
+			fail "$FORMAT"
+			exit 1
+		fi
+		echo "Installing the Raspberry Pi image... (this may take some time)"
+		UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
+		if echo "$UNMOUNT" | grep -q "fail"; then
+			fail "$UNMOUNT"
+			exit 1
+		fi
+		if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
+			UNMOUNT=$(diskutil unmountDisk $DISK)
+		fi
+		echo "$RASPBIAN"
+		echo "$DISK"
+		pause
+
+		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
+
+		if echo "$DD" | grep -q "unknown"; then
+			fail "$DD"
+			exit 1
+		fi
+	else
+		fail "Cancelled."
+	fi
+	echo "Done!"
+}
+
+image
+disk
