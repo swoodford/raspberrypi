@@ -41,7 +41,7 @@ function image(){
 	if [ -z "$RASPBIAN" ]; then
 		ZIPPED=$(find ~/Downloads -type f -name "*raspbian*.zip")
 		if [ -z "$ZIPPED" ]; then
-			fail "Could not find any Raspbian images."
+			fail "Could not find any Raspbian images in your Downloads folder."
 		else
 			echo "List of compressed Raspbian images"
 			echo "$ZIPPED"
@@ -101,8 +101,9 @@ function disk(){
 	if [ -z "$DISK" ]; then
 		fail "Must enter full path to disk to format!"
 	fi
+	echo	"================================================================================================="
 	tput setaf 1; echo "WARNING THE NEXT STEP WILL ERASE THE DISK!!!"
-	# tput setaf 1; 
+	echo	"================================================================================================="
 	read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY && tput sgr0
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -118,7 +119,6 @@ function disk(){
 			fail "$FORMAT"
 			exit 1
 		fi
-		echo "Installing the Raspberry Pi image... (this may take some time)"
 		UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
 		if echo "$UNMOUNT" | grep -q "fail"; then
 			fail "$UNMOUNT"
@@ -127,12 +127,15 @@ function disk(){
 		if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
 			UNMOUNT=$(diskutil unmountDisk $DISK)
 		fi
-		echo "$RASPBIAN"
-		echo "$DISK"
-		pause
-
+		echo "Raspbian Image: "; success "$RASPBIAN"
+		echo "Filesystem path: "; success "$DISK"
+		echo
+		# tput setaf 1; echo "CONFIRM AND FORMAT DISK?"
+		# pause
+		echo "================================================================================================="
+		echo "Installing the Raspberry Pi image... (this may take some time)"
+		echo "================================================================================================="
 		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
-
 		if echo "$DD" | grep -q "unknown"; then
 			fail "$DD"
 			exit 1
@@ -143,5 +146,7 @@ function disk(){
 	echo "Done!"
 }
 
+check_command "dd"
+check_command "diskutil"
 image
 disk
