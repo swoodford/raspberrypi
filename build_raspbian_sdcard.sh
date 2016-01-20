@@ -36,7 +36,7 @@ function image(){
 	echo	"================================================================================================="
 	pause
 
-	RASPBIAN=$(find ~/Downloads -type f -name "*raspbian*.img")
+	RASPBIAN=$(find ~/Downloads -type f -name "*raspbian*.img" | sort -r)
 
 	if [ -z "$RASPBIAN" ]; then
 		ZIPPED=$(find ~/Downloads -type f -name "*raspbian*.zip")
@@ -53,6 +53,7 @@ function image(){
 		echo
 		# echo "List of Raspbian images found in Downloads:"
 		success "$RASPBIAN"
+		echo
 		# echo Number of images found: $NUMIMAGES
 
 		if [ "$NUMIMAGES" -gt "1" ]; then
@@ -67,6 +68,11 @@ function image(){
 				echo
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					SELECTED="Y"
+					RASPBIAN=$IMAGE
+					if [[ $DEBUGMODE = "1" ]]; then
+						echo Image: $IMAGE
+						echo Raspbian: $RASPBIAN
+					fi
 					break
 				fi
 
@@ -127,7 +133,9 @@ function disk(){
 		if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
 			UNMOUNT=$(diskutil unmountDisk $DISK)
 		fi
+		echo
 		echo "Raspbian Image: "; success "$RASPBIAN"
+		echo
 		echo "Filesystem path: "; success "$DISK"
 		echo
 		# tput setaf 1; echo "CONFIRM AND FORMAT DISK?"
@@ -135,11 +143,17 @@ function disk(){
 		echo "================================================================================================="
 		echo "Installing the Raspberry Pi image... (this may take some time)"
 		echo "================================================================================================="
-		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
-		if echo "$DD" | grep -q "unknown"; then
-			fail "$DD"
-			exit 1
-		fi
+
+		start=$(date +%s)
+		pause
+		# DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
+		# if echo "$DD" | grep -q "unknown"; then
+		# 	fail "$DD"
+		# 	exit 1
+		# fi
+		dur=$(echo "$(date +%s) - $start" | bc)
+		printf "Execution time: %.2f seconds\n" $dur
+		echo "$DD"
 	else
 		fail "Cancelled."
 	fi
