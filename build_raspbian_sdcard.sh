@@ -133,10 +133,12 @@ function disk(){
 		if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
 			UNMOUNT=$(diskutil unmountDisk $DISK)
 		fi
-		echo
-		echo "Raspbian Image: "; success "$RASPBIAN"
-		echo
-		echo "Filesystem path: "; success "$DISK"
+		if [[ $DEBUGMODE = "1" ]]; then
+			echo
+			echo "Raspbian Image: "; success "$RASPBIAN"
+			echo
+			echo "Filesystem path: "; success "$DISK"
+		fi
 		echo
 		# tput setaf 1; echo "CONFIRM AND FORMAT DISK?"
 		# pause
@@ -146,11 +148,14 @@ function disk(){
 
 		start=$(date +%s)
 		pause
-		# DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
-		# if echo "$DD" | grep -q "unknown"; then
-		# 	fail "$DD"
-		# 	exit 1
-		# fi
+		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
+		if [[ $DEBUGMODE = "1" ]]; then
+			echo "DD is done..."
+		fi
+		if echo "$DD" | grep -q "unknown"; then
+			fail "$DD"
+			exit 1
+		fi
 		dur=$(echo "$(date +%s) - $start" | bc)
 		printf "Execution time: %.2f seconds\n" $dur
 		echo "$DD"
