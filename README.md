@@ -5,6 +5,7 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 
 [![Build Status](https://travis-ci.org/swoodford/raspberrypi.svg?branch=master)](https://travis-ci.org/swoodford/raspberrypi)
 
+- **bluetooth-scan.sh** Install, initialize Bluetooth USB Dongle and scan for devices
 - **build_raspbian_sdcard.sh** Script to build Raspbian bootable SD card from Raspbian img file
 - **customize-pi.sh** Setup and Customize New Raspberry Pi Raspbian Installation
 - **install-air-pi.sh** Install the Shairport Airplay emulator for Raspberry Pi
