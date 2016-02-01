@@ -14,4 +14,5 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 - **install-uv4l.sh** Install UV4L for Raspberry Pi camera
 - **ip-location.py** Print your IP-based geolocation coordinates
 - **ip_mailer.py** Email Raspberry Pi IP Address at boot using Gmail SMTP server
+- **speedtest.py** Run a speedtest and tweet to Time Warner when slow
 - **take-photo.py** Take a photo from the Raspberry Pi camera
