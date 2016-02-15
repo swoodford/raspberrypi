@@ -5,11 +5,12 @@
 # https://github.com/sivel/speedtest-cli
 # https://twitter.com/A_Comcast_User
 
-# import sys
-import os
 import csv
 import datetime
+import os
+import sys
 import time
+
 import twitter
 
 
