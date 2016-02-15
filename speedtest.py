@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # http://www.pcworld.com/article/3027446/hardware/irate-comcast-subscriber-turns-raspberry-pi-into-a-watchdog-for-slow-internet-speeds.html
 # http://pastebin.com/WMEh802V
