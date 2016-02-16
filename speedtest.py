@@ -60,7 +60,7 @@ def test():
                         pass
 
         # tweet if down speed is less than whatever I set
-        elif eval(d) < 50:
+        elif eval(d) < 100:
                 print "trying to tweet"
                 try:
                         # i know there must be a better way than to do (str(int(eval())))
