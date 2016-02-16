@@ -18,7 +18,7 @@ def test():
 
         # run speedtest-cli
         print 'running test'
-        a = os.popen("python /home/pi/speedtest/speedtest-cli --simple").read()
+        a = os.popen("python /usr/local/bin/speedtest-cli --simple").read()
         print 'ran'
         # split the 3 line result (ping,down,up)
         lines = a.split('\n')
@@ -43,12 +43,12 @@ def test():
         out_file.close()
 
         # connect to twitter
-        TOKEN = ""
-        TOKEN_KEY = ""
-        CON_SEC = ""
-        CON_SEC_KEY = ""
+        token = ""
+        token_key = ""
+        con_sec = ""
+        con_sec_key = ""
 
-        my_auth = twitter.OAuth(TOKEN, TOKEN_KEY, CON_SEC, CON_SEC_KEY)
+        my_auth = twitter.OAuth(token, token_key, con_sec, con_sec_key)
         twit = twitter.Twitter(auth=my_auth)
 
         # try to tweet if speedtest couldnt even connet. Probably wont work if the internet is down
