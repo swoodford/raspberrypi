@@ -5,6 +5,9 @@
 # https://github.com/sivel/speedtest-cli
 # https://twitter.com/A_Comcast_User
 
+# Requires sudo pip install twitter
+# DO NOT sudo pip install python-twitter
+
 import csv
 import datetime
 import os
@@ -17,7 +20,7 @@ import twitter
 def test():
 
         # run speedtest-cli
-        print 'running test'
+        print 'Running speedtest...'
         a = os.popen("python /usr/local/bin/speedtest-cli --simple").read()
         print 'ran'
         # split the 3 line result (ping,down,up)
@@ -42,7 +45,7 @@ def test():
         writer.writerow((ts * 1000, p, d, u))
         out_file.close()
 
-        # connect to twitter
+        # Twitter Credentials
         token = ""
         token_key = ""
         con_sec = ""
@@ -51,7 +54,7 @@ def test():
         my_auth = twitter.OAuth(token, token_key, con_sec, con_sec_key)
         twit = twitter.Twitter(auth=my_auth)
 
-        # try to tweet if speedtest couldnt even connet. Probably wont work if the internet is down
+        # Try to tweet if speedtest couldnt even connect. Probably wont work if the internet is down
         if "Cannot" in a:
                 try:
                         tweet = "Hey @TWC @TWC_Help why is my internet down? I pay for 100down\\10up in #Westchester #NY? #twcoutage #TWC"
@@ -59,11 +62,11 @@ def test():
                 except:
                         pass
 
-        # tweet if down speed is less than whatever I set
+        # Tweet if down speed is less than whatever I set
         elif eval(d) < 100:
                 print "trying to tweet"
                 try:
-                        # i know there must be a better way than to do (str(int(eval())))
+                        # I know there must be a better way than to do (str(int(eval())))
                         tweet = "Hey @TWC why is my internet speed " + str(int(eval(d))) + "down\\" + str(int(eval(u))) + "up when I pay for 100down\\10up in #Westchester #NY? @TWC_Help @TWC_NYNJ #TWC #slow #speedtest"
                         twit.statuses.update(status=tweet)
                 except Exception, e:
