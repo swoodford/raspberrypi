@@ -56,18 +56,19 @@ def test():
 
         # Try to tweet if speedtest couldnt even connect. Probably wont work if the internet is down
         if "Cannot" in a:
+                print "Internet seems to be down."
                 try:
-                        tweet = "Hey @TWC @TWC_Help why is my internet down? I pay for 100down\\10up in #Westchester #NY? #twcoutage #TWC"
+                        tweet = "Hey @TWC @TWC_Help why is my internet down? I pay for 100down\\15up in #Westchester #NY? #twcoutage #TWC"
                         twit.statuses.update(status=tweet)
                 except:
                         pass
 
         # Tweet if down speed is less than whatever I set
         elif eval(d) < 100:
-                print "trying to tweet"
+                print "Tweeting slow bandwidth."
                 try:
                         # I know there must be a better way than to do (str(int(eval())))
-                        tweet = "Hey @TWC why is my internet speed " + str(int(eval(d))) + "down\\" + str(int(eval(u))) + "up when I pay for 100down\\10up in #Westchester #NY? @TWC_Help @TWC_NYNJ #TWC #slow #speedtest"
+                        tweet = "Hey @TWC why is my internet speed " + str(int(eval(d))) + "down\\" + str(int(eval(u))) + "up when I pay for 100down\\15up in #Westchester #NY? @TWC_Help @TWC_NYNJ #TWC #slow #speedtest"
                         twit.statuses.update(status=tweet)
                 except Exception, e:
                         print str(e)
