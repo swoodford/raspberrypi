@@ -68,7 +68,7 @@ def test():
                 print "Tweeting slow bandwidth."
                 try:
                         # I know there must be a better way than to do (str(int(eval())))
-                        tweet = "Hey @TWC why is my #internet #speed " + str(int(eval(d))) + "down\\" + str(int(eval(u))) + "up when I pay for 100 down\\10 up in #Westchester #NY? @TWC_Help @TWC_NYNJ #TWC #slow #speedtest"
+                        tweet = "Hey @TWC why is my #internet #speed " + str(int(eval(d))) + " down\\" + str(int(eval(u))) + " up when I pay for 100 down\\10 up in #Westchester #NY? @TWC_Help @TWC_NYNJ #TWC #slow #speedtest"
                         twit.statuses.update(status=tweet)
                 except Exception, e:
                         print str(e)
