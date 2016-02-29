@@ -35,6 +35,8 @@ fi
 
 # PACKAGE UPDATES AND INSTALLATIONS
 sudo apt-get update
+sudo apt-get dist-upgrade -y
+sudo sync
 sudo apt-get install -y git ImageMagick python-setuptools cmake libssl-dev rpi-update --force-yes
 sudo easy_install pip
 sudo apt-get upgrade -y
