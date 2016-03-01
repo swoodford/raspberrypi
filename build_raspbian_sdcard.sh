@@ -11,15 +11,16 @@ function check_command {
 	type -P $1 &>/dev/null || fail "Unable to find $1, please install it and run this script again."
 }
 
+# Alert
+function alert(){
+	tput setaf 1; echo "$*" && tput sgr0
+	exit 1
+}
+
 # Fail
 function fail(){
 	tput setaf 1; echo "Failure: $*" && tput sgr0
 	exit 1
-}
-
-# Success
-function success(){
-	tput setaf 2; echo "$*" && tput sgr0
 }
 
 # Pause
@@ -27,6 +28,22 @@ function pause(){
 	read -p "Press any key to continue..."
 	echo
 }
+
+# Success
+function success(){
+	tput setaf 2; echo "$*" && tput sgr0
+}
+
+# Unmount
+function unmount(){
+	echo "Unmounting" $DISK "..."
+	UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
+	if echo "$UNMOUNT" | grep -q "fail"; then
+		fail "$UNMOUNT"
+		exit 1
+	fi
+}
+
 
 # Select Raspian Image
 function image(){
@@ -43,7 +60,7 @@ function image(){
 		if [ -z "$ZIPPED" ]; then
 			fail "Could not find any Raspbian images in your Downloads folder."
 		else
-			echo "List of compressed Raspbian images"
+			echo "Found compressed Raspbian image:"
 			echo "$ZIPPED"
 			fail "Must uncompress image first."
 		fi
@@ -93,12 +110,12 @@ function image(){
 # Select Mounted Disk
 function disk(){
 	echo
-	echo	"================================================================================================="
+	echo "================================================================================================="
 	success "List of mounted disks:"
 	echo
 	df -lH
 	success "(The Filesystem column is the path to the disk.)"
-	echo	"================================================================================================="
+	echo "================================================================================================="
 	# ls -fl /Volumes/
 	echo
 	echo "Type the full Filesystem path to disk for your Raspberry Pi MicroSD Card:"
@@ -107,31 +124,22 @@ function disk(){
 	if [ -z "$DISK" ]; then
 		fail "Must enter full path to disk to format!"
 	fi
-	echo	"================================================================================================="
-	tput setaf 1; echo "WARNING THE NEXT STEP WILL ERASE THE DISK!!!"
-	echo	"================================================================================================="
-	read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY && tput sgr0
+	alert "================================================================================================="
+	alert "WARNING THE NEXT STEP WILL ERASE THE DISK!!!"
+	alert "================================================================================================="
+	tput setaf 1; read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY && tput sgr0
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		echo "Unmounting" $DISK
-		UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
-		if echo "$UNMOUNT" | grep -q "fail"; then
-			fail "$UNMOUNT"
-			exit 1
-		fi
-		echo "Formatting with FAT32"
+		unmount
+		echo "Formatting with FAT32..."
 		FORMAT=$(sudo diskutil eraseDisk FAT32 RASPBERRYPI MBRFormat $DISK 2>&1)
 		if echo "$FORMAT" | grep -q "fail"; then
 			fail "$FORMAT"
 			exit 1
 		fi
-		UNMOUNT=$(diskutil unmountDisk $DISK 2>&1)
-		if echo "$UNMOUNT" | grep -q "fail"; then
-			fail "$UNMOUNT"
-			exit 1
-		fi
+		unmount
 		if [[ $UNMOUNT = "dd: $DISK: Resource busy" ]]; then
-			UNMOUNT=$(diskutil unmountDisk $DISK)
+			UNMOUNT=$(sudo diskutil unmountDisk $DISK)
 		fi
 		if [[ $DEBUGMODE = "1" ]]; then
 			echo
@@ -143,10 +151,10 @@ function disk(){
 		# tput setaf 1; echo "CONFIRM AND FORMAT DISK?"
 		# pause
 		echo "================================================================================================="
-		echo "Installing the Raspberry Pi image... (this may take some time)"
+		success "Installing the Raspberry Pi image... (this may take some time)"
 		echo "================================================================================================="
-
 		start=$(date +%s)
+		echo $start
 		pause
 		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
 		if [[ $DEBUGMODE = "1" ]]; then
@@ -162,7 +170,9 @@ function disk(){
 	else
 		fail "Cancelled."
 	fi
-	echo "Done!"
+	success "Done!"
+	osascript -e 'tell app "Terminal" to display dialog "Raspbian bootable SD card ready!"'
+	unmount
 }
 
 check_command "dd"
