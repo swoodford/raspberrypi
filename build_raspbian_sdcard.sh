@@ -14,7 +14,6 @@ function check_command {
 # Alert
 function alert(){
 	tput setaf 1; echo "$*" && tput sgr0
-	exit 1
 }
 
 # Fail
@@ -122,6 +121,13 @@ function disk(){
 	echo "Example: /dev/disk5"
 	read DISK
 	if [ -z "$DISK" ]; then
+		alert "Must enter full path to disk to format!"
+		echo
+		echo "Type the full Filesystem path to disk for your Raspberry Pi MicroSD Card:"
+		echo "Example: /dev/disk5"
+		read DISK
+	fi
+	if [ -z "$DISK" ]; then
 		fail "Must enter full path to disk to format!"
 	fi
 	alert "================================================================================================="
@@ -154,8 +160,10 @@ function disk(){
 		success "Installing the Raspberry Pi image... (this may take some time)"
 		echo "================================================================================================="
 		start=$(date +%s)
-		echo $start
-		pause
+		if [[ $DEBUGMODE = "1" ]]; then
+			echo $start
+			pause
+		fi
 		DD=$(eval sudo dd bs=1m if="$RASPBIAN" of="$DISK" 2>&1)
 		if [[ $DEBUGMODE = "1" ]]; then
 			echo "DD is done..."
