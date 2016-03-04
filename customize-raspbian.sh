@@ -37,9 +37,11 @@ fi
 sudo apt-get update
 sudo apt-get dist-upgrade -y
 sudo sync
-sudo apt-get install -y git ImageMagick python-setuptools cmake libssl-dev rpi-update --force-yes
+sudo apt-get install -y git ImageMagick python-setuptools cmake libssl-dev rpi-update python-dev libffi-dev libssl-dev --force-yes
 sudo easy_install pip
 sudo apt-get upgrade -y
+sudo pip install pyopenssl ndg-httpsclient pyasn1
+sudo pip install twython
 sudo rpi-update
 
 
@@ -61,6 +63,9 @@ sudo ifdown wlan0
 sudo ifup wlan0
 
 # SSH
+# Copies the contents of the id_rsa.pub file to your clipboard
+# pbcopy < ~/.ssh/id_rsa.pub
+
 mkdir ~/.ssh
 touch ~/.ssh/authorized_keys
 chmod 700 ~/.ssh
