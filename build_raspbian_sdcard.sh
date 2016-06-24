@@ -47,9 +47,9 @@ function unmount(){
 # Select Raspian Image
 function image(){
 	# clear
-	echo	"================================================================================================="
-	success "This tool will build a Raspbian bootable SD card from Raspbian img file in your Downloads folder."
-	echo	"================================================================================================="
+	echo	"================================================================================================================="
+	success "This tool will build a Raspbian bootable SD card from an uncompressed Raspbian img file in your Downloads folder."
+	echo	"================================================================================================================="
 	pause
 
 	RASPBIAN=$(find ~/Downloads -type f -name "*raspbian*.img" | sort -r)
@@ -57,15 +57,15 @@ function image(){
 	if [ -z "$RASPBIAN" ]; then
 		ZIPPED=$(find ~/Downloads -type f -name "*raspbian*.zip")
 		if [ -z "$ZIPPED" ]; then
-			fail "Could not find any Raspbian images in your Downloads folder."
+			fail "Could not find any Raspbian img files in your Downloads folder."
 		else
-			echo "Found compressed Raspbian image:"
+			echo "Found compressed Raspbian img:"
 			echo "$ZIPPED"
-			fail "Must uncompress image first."
+			fail "Must uncompress img first."
 		fi
 	else
 		NUMIMAGES=$(echo "$RASPBIAN" | wc -l)
-		success Found $NUMIMAGES Raspbian images in Downloads.
+		success Found $NUMIMAGES Raspbian img files in Downloads.
 		echo
 		# echo "List of Raspbian images found in Downloads:"
 		success "$RASPBIAN"
@@ -80,7 +80,7 @@ function image(){
 				# echo \#$COUNT
 				IMAGE=$(echo "$RASPBIAN" | nl | grep -w $COUNT | cut -f2)
 				echo "Image: "$IMAGE
-				read -rp "Use this Raspbian image? (y/n) " REPLY
+				read -rp "Use this Raspbian img file? (y/n) " REPLY
 				echo
 				if [[ $REPLY =~ ^[Yy]$ ]]; then
 					SELECTED="Y"
@@ -100,7 +100,7 @@ function image(){
 			done
 
 			if ! [[ $SELECTED =~ "Y" ]]; then
-				fail "Must select at least one Raspbian image!"
+				fail "Must select at least one Raspbian img file!"
 			fi
 		fi
 	fi
@@ -131,7 +131,7 @@ function disk(){
 		fail "Must enter full path to disk to format!"
 	fi
 	alert "================================================================================================="
-	alert "WARNING THE NEXT STEP WILL ERASE THE DISK!!!"
+	alert "WARNING THE NEXT STEP WILL ERASE THE SD CARD!!!"
 	alert "================================================================================================="
 	tput setaf 1; read -rp "Proceed to erase and format \"$DISK\" with Raspbian image? (y/n) " REPLY && tput sgr0
 	echo
@@ -157,7 +157,8 @@ function disk(){
 		# tput setaf 1; echo "CONFIRM AND FORMAT DISK?"
 		# pause
 		echo "================================================================================================="
-		success "Installing the Raspberry Pi image... (this may take some time)"
+		success "Installing the Raspberry Pi image to SD Card... (this may take some time)"
+		alert "DO NOT REMOVE THE SD CARD!!!"
 		echo "================================================================================================="
 		start=$(date +%s)
 		if [[ $DEBUGMODE = "1" ]]; then
