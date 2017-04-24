@@ -18,5 +18,7 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 - **ip_mailer.py** Email Raspberry Pi IP Address at boot using Gmail SMTP server
 - **speedtest-ifttt.sh** Run a speedtest and log the results to a Google sheet using IFTTT
 - **speedtest.py** Run a speedtest and tweet to Time Warner when slow
-- **stockmonitor.py** Raspberry Pi and NeoPixel Stock Symbol Price Monitor LEDs
+- **stockmonitor-neopixel.py** Raspberry Pi and NeoPixel Stock Symbol Price Monitor
+- **stockmonitor-sensehat.py** Raspberry Pi and Sense Hat Stock Symbol Price Monitor
+- **stockticker-sensehat.py** Raspberry Pi and Sense Hat Stock Symbol Price Ticker
 - **take-photo.py** Take a photo from the Raspberry Pi camera

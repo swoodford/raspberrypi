@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-# Raspberry Pi and NeoPixel Stock Symbol Price Monitor LEDs
-# A simple stock ticker price change monitor of today's positive or negative change using an Adafruit NeoPixel RGB LED Strip
+# Raspberry Pi and Sense Hat Stock Symbol Price Monitor
+# A simple stock ticker price change monitor of today's positive or negative change using the Sense Hat
+# Shows a full red/green solid color 8x8 matrix
 
 import datetime
 import time
@@ -10,46 +11,30 @@ import atexit
 import sys
 import os
 import urllib2
-# import signal
 
 from socket import error as SocketError
 import errno
 
 from decimal import *
-from neopixel import *
+
+from sense_hat import SenseHat
+
+sense = SenseHat()
 
 debug = 0
 
 # Stock quote configuration:
 tickerSymbol = 'AAPL'
 
-# LED strip configuration:
-LED_COUNT      = 8      # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA        = 4       # DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 10     # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
-
 
 # Define functions which animate LEDs in various ways.
-
-def solidColor(strip, color):
-	for i in range(strip.numPixels()):
-		strip.setPixelColor(i, color)
-		strip.show()
 
 def lightsOut():
 	# Turn off all the LEDs.
 	if debug == 1:
 		print ('Turning off all LEDs.')
 
-	strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-	strip.begin()
-
-	for i in range(strip.numPixels()):
-		strip.setPixelColor(i, 0)
-		strip.show()
+	sense.clear()
 
 def marketClosed():
 	print "Stock Market Closed.", now
@@ -57,8 +42,6 @@ def marketClosed():
 	time.sleep(60)
 
 atexit.register(lightsOut)
-
-
 
 if debug == 1:
 	allInfo = ystockquote.get_all(tickerSymbol)
@@ -112,41 +95,28 @@ def getQuote(change):
 		LED_BRIGHTNESS = abs(int(round(100 * changedecimal)))
 		if LED_BRIGHTNESS > 255:
 			LED_BRIGHTNESS = 255
+		if LED_BRIGHTNESS < 50:
+			LED_BRIGHTNESS = 50
 		if debug == 1:
 			print "Brightness: ", LED_BRIGHTNESS
-		strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-		strip.begin()
-		# Colors: GREEN, RED, BLUE
-		solidColor(strip, Color(0, 255, 0))
+		sense.clear([LED_BRIGHTNESS, 0, 0])
 
 	# Positive
 	if changedecimal > 0:
 		LED_BRIGHTNESS = int(round(100 * changedecimal))
 		if LED_BRIGHTNESS > 255:
 			LED_BRIGHTNESS = 255
+		if LED_BRIGHTNESS < 50:
+			LED_BRIGHTNESS = 50
 		if debug == 1:
 			print "Brightness: ", LED_BRIGHTNESS
-		strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-		strip.begin()
-		# Colors: GREEN, RED, BLUE
-		solidColor(strip, Color(255, 0, 0))
+		sense.clear([0, LED_BRIGHTNESS, 0])
 
 	# Zero
 	if changedecimal == 0:
 		if debug == 1:
 			print "Zero Change!"
-		LED_BRIGHTNESS = 10
-		strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-		strip.begin()
-		strip.setPixelColor(0, Color(0, 255, 0))
-		strip.setPixelColor(1, Color(255, 0, 0))
-		strip.setPixelColor(2, Color(0, 255, 0))
-		strip.setPixelColor(3, Color(255, 0, 0))
-		strip.setPixelColor(4, Color(0, 255, 0))
-		strip.setPixelColor(5, Color(255, 0, 0))
-		strip.setPixelColor(6, Color(0, 255, 0))
-		strip.setPixelColor(7, Color(255, 0, 0))
-		strip.show()
+		sense.clear([50, 50, 50])
 
 	time.sleep(1)
 
