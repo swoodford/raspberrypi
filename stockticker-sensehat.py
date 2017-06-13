@@ -72,8 +72,8 @@ def getQuote(change):
 			print "err.code: ", err.code
 			# pass
 	except urllib2.URLError as err:
-		print "Connection reset by peer: ", err.code
-		# pass
+		print "Connection reset by peer."
+		pass
 	except SocketError as err:
 	    if err.errno == errno.ECONNRESET:
 	        print "Connection reset by peer."
