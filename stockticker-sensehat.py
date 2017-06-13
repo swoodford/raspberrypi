@@ -4,18 +4,20 @@
 # A simple stock ticker price change monitor of today's positive or negative change using the Sense Hat
 # Shows a red/green solid color 8x8 matrix up/down arrow and stock price ticker
 
-import datetime
-import time
-import ystockquote
 import atexit
-import sys
+import datetime
+import decimal
+import errno
 import os
+import signal
+import sys
+import time
 import urllib2
+import ystockquote
 
 from socket import error as SocketError
-import errno
 
-from decimal import *
+# from decimal import *
 
 from sense_hat import SenseHat
 
@@ -30,21 +32,24 @@ debug = 0
 tickerSymbol = 'AAPL'
 
 
-# Define functions which animate LEDs in various ways.
+# Functions
 
+# Turn off all the LEDs
 def lightsOut():
-	# Turn off all the LEDs.
 	if debug == 1:
 		print ('Turning off all LEDs.')
 	sense.clear()
 
+# Console message and LEDs off while market closed
 def marketClosed():
 	print "Stock Market Closed.", now
 	lightsOut()
 	time.sleep(60)
 
+# Turn the LEDs off at program exit
 atexit.register(lightsOut)
 
+# Debugging
 if debug == 1:
 	allInfo = ystockquote.get_all(tickerSymbol)
 	print allInfo
@@ -57,37 +62,50 @@ if debug == 1:
 
 # print allInfo
 
-getcontext().prec = 8
+decimal.getcontext().prec = 8
 
+# Handle timeouts gracefully
+def timeoutHandler(signum, frame):
+	print "Error: Timeout fetching quote."
+
+signal.signal(signal.SIGALRM, timeoutHandler)
+
+# Main function to get the quote and animate the LEDs
 def getQuote(change):
 	if debug == 1:
 		print "Function getQuote"
 
 	try:
+		signal.alarm(10)
 		change = ystockquote.get_change(tickerSymbol)
 	except urllib2.HTTPError as err:
 		if err.code == 404:
-			print "404 ERROR"
+			print "Error: 404 Not Found."
 		else:
-			print "err.code: ", err.code
+			print "Error: ", err.code
 			# pass
 	except urllib2.URLError as err:
-		print "Connection reset by peer."
+		print "Error: Connection reset by peer."
 		pass
 	except SocketError as err:
 	    if err.errno == errno.ECONNRESET:
-	        print "Connection reset by peer."
+	        print "Error: Connection reset by peer."
 	    	pass
 	# price = ystockquote.get_price(tickerSymbol)
 
 	while change == 'N/A':
-		print "ERROR: NO PRICE CHANGE DATA!"
+		print "Error: No price change data."
 		time.sleep(60)
 		change = ystockquote.get_change(tickerSymbol)
 
-	changedecimal = Decimal(change)
+	changedecimal = decimal.Decimal(change)
 	# pricedecimal = Decimal(price)
 	# changedecimal = 0
+
+	# Reset timeout
+	signal.alarm(0)
+
+	# Console message with price change
 	print "$ Change: ", changedecimal
 	# print pricedecimal
 
@@ -211,6 +229,7 @@ if __name__ == '__main__':
 			else:
 				marketClosed()
 
+	# Handle Ctrl-C gracefully
 	except KeyboardInterrupt:
 		lightsOut()
 		print ' - Exiting'
