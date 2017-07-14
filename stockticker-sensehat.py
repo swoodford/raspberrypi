@@ -67,6 +67,9 @@ decimal.getcontext().prec = 8
 # Handle timeouts gracefully
 def timeoutHandler(signum, frame):
 	print "Error: Timeout fetching quote."
+	lightsOut()
+	time.sleep(10)
+	pass
 
 signal.signal(signal.SIGALRM, timeoutHandler)
 
