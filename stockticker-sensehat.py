@@ -69,7 +69,8 @@ def timeoutHandler(signum, frame):
 	print "Error: Timeout fetching quote."
 	lightsOut()
 	time.sleep(10)
-	pass
+	signal.alarm(0)
+	return
 
 signal.signal(signal.SIGALRM, timeoutHandler)
 
@@ -86,14 +87,11 @@ def getQuote(change):
 			print "Error: 404 Not Found."
 		else:
 			print "Error: ", err.code
-			# pass
 	except urllib2.URLError as err:
 		print "Error: Connection reset by peer."
-		pass
 	except SocketError as err:
-	    if err.errno == errno.ECONNRESET:
-	        print "Error: Connection reset by peer."
-	    	pass
+		if err.errno == errno.ECONNRESET:
+			print "Error: Connection reset by peer."
 	# price = ystockquote.get_price(tickerSymbol)
 
 	while change == 'N/A':
