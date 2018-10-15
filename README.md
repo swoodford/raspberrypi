@@ -20,5 +20,6 @@ A collection of scripts for performing various tasks with a Raspberry Pi
 - **speedtest.py** Run a speedtest and tweet to Time Warner when slow
 - **stockmonitor-neopixel.py** Raspberry Pi and NeoPixel Stock Symbol Price Monitor
 - **stockmonitor-sensehat.py** Raspberry Pi and Sense Hat Stock Symbol Price Monitor
+- **stockticker-ledboard.py** Raspberry Pi and MAX7219 LED Board Stock Symbol Price Ticker
 - **stockticker-sensehat.py** Raspberry Pi and Sense Hat Stock Symbol Price Ticker
 - **take-photo.py** Take a photo from the Raspberry Pi camera
